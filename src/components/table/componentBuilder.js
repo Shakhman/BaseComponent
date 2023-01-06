@@ -1,12 +1,6 @@
 import ComponentWrapper from '../ComponentWrapper.vue';
-import { VDialog } from 'vuetify/lib';
-
-function getComponents(headerModules) {
-  return Object.keys(headerModules).reduce((acc, module) => {
-    acc[module] = () => import(`./modules/${module}.vue`);
-    return acc;
-  }, {});
-}
+import withSearch from './modules/hocs/withSearch';
+import withFullscreen from './modules/hocs/withFullscreen';
 
 const ViewOptions = {
   table: {
@@ -20,6 +14,7 @@ const ViewOptions = {
             this.$set(this.tablePropsProxy, 'options', obj);
           }
         },
+        scopedSlots: this.$scopedSlots,
       }
     }
   },
@@ -33,8 +28,10 @@ const ViewOptions = {
 export default class ComponentBuilder {
   constructor() {
     this.view = {};
-    this.headerModules = {};
-    this.tableModules = {};
+    this.Component = ComponentWrapper;
+
+    this.componentHocList = [];
+    this.viewHocList = [];
   }
 
   async withView(view) {
@@ -48,49 +45,22 @@ export default class ComponentBuilder {
     return this;
   }
 
-  withResizableColumns() {
-    import('./modules/hocs/resizeableColumns').then((m) => {
-      this.view.component = m.default(this.view.component);
-    })
+  // withResizableColumns() {
+  //   import('./modules/hocs/resizeableColumns').then((m) => {
+  //     this.view.component = m.default(this.view.component);
+  //   })
 
-    return this;
-  }
+  //   return this;
+  // }
 
   withSearch() {
-    this.headerModules.Search = {
-      slot: 'search',
-      render(h) {
-        const externalProps = this.headerProps?.modules?.search || {};
-        this.$set(this.tablePropsProxy, 'search', externalProps.value || '');
-
-        return () => h('Search', {
-          props: externalProps,
-          on: {
-            input: (e) => {
-              externalProps.value = e;
-              this.$emit('search', e);
-            }
-          },
-        }, []);
-      },
-    };
+    this.componentHocList = [...this.componentHocList, withSearch ];
 
     return this;
   }
 
   withFullscreen() {
-    this.headerModules.Fullscreen = {
-      slot: 'fullscreen',
-      render(h) {
-        return () => h('Fullscreen', {
-          on: {
-            click: () => {
-              this.isFullscreen = true;
-            }
-          }
-        }, []);
-      }
-    };
+    this.componentHocList = [...this.componentHocList, withFullscreen ];
 
     return this;
   }
@@ -99,15 +69,21 @@ export default class ComponentBuilder {
     const view = this.view;
     const self = this;
 
+
+    this.componentHocList.forEach((hoc) => {
+      this.Component = hoc(self.Component);
+    });
+
     return {
-      components: {
-        ...getComponents(self.headerModules)
-      },
+      name: 'ComponentBuilder',
       props: {
         headerProps: {
           type: Object,
         },
         tableProps: {
+          type: Object,
+        },
+        moduleSearch: {
           type: Object,
         },
       },
@@ -116,46 +92,23 @@ export default class ComponentBuilder {
           tablePropsProxy: {
             search: ''
           },
-          headerPropsProxy: {},
-          isFullscreen: false,
         }
       },
-      render(h) {
-        const headerModules = Object.values(self.headerModules).reduce(((acc, val) => {
-          acc[val.slot] = val.render.call(this, h);
-          return acc;
-        }), {});
-
-        const Component = h(ComponentWrapper, {
+      render(h) {        
+        return h(self.Component, {
           props: {
             ...this.headerProps,
-            ...this.headerPropsProxy
+            ...this.$props,
           },
+          on: {
+            ...this.$listeners, search: (e) => {
+              this.tablePropsProxy.search = e;
+          } },
           scopedSlots: {
             default: () => h(view.component, ViewOptions[view.view].init.call(this)),
-            ...headerModules,
+            ...this.$scopedSlots
           },
         });
-        
-        const nodes = [Component];
-
-        if (this.isFullscreen) {
-          nodes.push(h(VDialog, {
-            props: {
-              value: this.isFullscreen,
-            },
-            scopedSlots: {
-              default: () => Component
-            },
-            on: {
-              input: (e) => {
-                this.isFullscreen = e;
-              }
-            }
-          }));
-        }
-         
-        return h('div', nodes)
       }
     }
   }

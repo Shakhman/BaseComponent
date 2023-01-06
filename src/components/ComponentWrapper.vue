@@ -15,7 +15,7 @@
       title: {
         type: String,
       },
-    }
+    },
   }
 </script>
 

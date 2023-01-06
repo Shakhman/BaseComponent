@@ -61,7 +61,7 @@
 
         this.$emit('update:options', this.tempOptions);
       }
-    }
+    },
   }
 </script>
 
