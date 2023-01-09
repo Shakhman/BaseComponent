@@ -5,7 +5,7 @@
       <slot name="search"></slot>
       <slot name="fullscreen"></slot>
     </div>
-    <slot></slot>
+    <slot name="context">asdad</slot>
   </div>
 </template>
 

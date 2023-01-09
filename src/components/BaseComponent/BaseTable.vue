@@ -1,5 +1,5 @@
 <template>
-  <v-data-table :items="items" :headers="headers" :search="search" v-bind="options"
+  <v-data-table :items="items" :headers="headers" :search="search" v-bind="mergedOptions"
     @update:options="onOptionsUpdate"
   >
     <slot
@@ -20,8 +20,18 @@
   </v-data-table>
 </template>
 
-
 <script>
+const initialOptions = () => ({
+  page: 1,
+  itemsPerPage: 10,
+  sortBy: ['name'],
+  sortDesc: [true],
+  groupBy: [],
+  groupDesc: [],
+  multiSort: false,
+  mustSort: false
+});
+
   export default {
     props: {
       search: {
@@ -37,29 +47,20 @@
         required: true,
       },
       options: {
-        type: Object,
-        default: () => ({
-          page: 1,
-          itemsPerPage: 10,
-          sortBy: [],
-          sortDesc: [],
-          groupBy: [],
-          groupDesc: [],
-          multiSort: false,
-          mustSort: false
-        })
+        type: Object,      
       },
     },
-    data() {
-      return {
-        tempOptions: {},
+    computed: {
+      mergedOptions() {
+        return {
+          ...initialOptions(),
+          ...this.options,
+        }
       }
     },
     methods: {
       onOptionsUpdate(options) {
-        this.tempOptions = options;
-
-        this.$emit('update:options', this.tempOptions);
+        this.$emit('update:options', options);
       }
     },
   }

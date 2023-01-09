@@ -1,6 +1,6 @@
 <template>
   <div id="search">
-    <v-text-field :value="value" :label="label" v-on="$listeners">
+    <v-text-field :value="moduleSearchProps.value" :label="moduleSearchProps.label" v-on="$listeners">
     </v-text-field>
 </div>
 </template>
@@ -9,14 +9,10 @@
 export default {
   name: 'SearchField',
   props: {
-    value: {
-      type: String,
+    moduleSearchProps: {
+      type: Object,
       required: true,
     },
-    label: {
-      type: String,
-      default: 'Search',
-    }
   },
 }
 </script>

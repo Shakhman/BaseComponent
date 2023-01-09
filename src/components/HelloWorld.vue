@@ -2,7 +2,7 @@
   <v-container>
     <v-row class="text-center">
       <v-col cols="12">
-        <TheComponent @search="onSearch" :header-props="hProps" :table-props="tProps" @clicked:fullscreen="hasF" :moduleSearch="moduleSearch">
+        <TheComponent :header-props="hProps" :table-props="tProps" @clicked:fullscreen="hasF" :moduleSearch="moduleSearch">
           <template #[`item.name`]="{ item: { name }}">
             {{ name }} from Slot
           </template>
@@ -15,21 +15,20 @@
 </template>
 
 <script>
-import ComponentBuilder from './table/componentBuilder';
+import TableComponentBuilder from './BaseComponent/TableComponentBuilder.js';
 
 export default {
   data() {
     return {
       moduleSearch: {
-        props: {    
-          value: 'Name2',
-        },
-        on: {
-          search: (e) => {
-            console.log(e);
-            this.moduleSearch = {...this.moduleSearch, props: { ...this.moduleSearch.props, label: e } }
-          }
-        }
+        // props: {    
+        //   value: 'Name2',
+        // },
+        // on: {
+        //   onInput: (e) => {
+        //     this.moduleSearch = {...this.moduleSearch, props: { value: e, label: e } }
+        //   }
+        // }
       },
       hProps: {
         title: 'Title 1',
@@ -56,6 +55,7 @@ export default {
             type: 'type2',
           },
         ],
+        options: {sortBy: ['type']}
       },
       hProps2: {
         title: 'Title 2',
@@ -97,24 +97,17 @@ export default {
     }
   },
   components: {
-    TheComponent: () => {
-      return new ComponentBuilder().withView('table').then(self => {
-        return self.withSearch().withFullscreen().build();
-      });
+    TheComponent: async () => {
+      const builder = await (new TableComponentBuilder()).withContext('table');
+      return builder.withFullscreen().withSearch().build();
     },
     // TheComponent2: () => {
-    //   return new ComponentBuilder().withView('table').then(self => {
+    //   return new TableComponentBuilder().withView('table').then(self => {
     //     return self.build();
     //   });
     // }
   },
   methods: {
-    onSearch(search) {
-      this.moduleSearch.props.value = search
-    },
-    onSearch2(search) {
-      console.log('search', search);
-    },
     hasF(val) {
       console.log('hasF', val);
     }

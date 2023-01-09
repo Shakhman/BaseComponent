@@ -3,15 +3,14 @@ import { VDialog } from 'vuetify/lib';
 
 export default function withFullscreen(WrappedComponent) {
   return {
-    props: {
-      ...WrappedComponent.props,
-    },
+    name: 'WithFullscreen',
+    props: WrappedComponent.props,
     data: () => ({
       isFullscreen: false,
     }),
     render(h) {
       const namedSlotContent = h(Fullscreen, {
-        slot: 'fullscreen', props: { value: 'Value' }, on: {
+        slot: 'fullscreen', props: { value: this.isFullscreen }, on: {
           click: () => {
             this.isFullscreen = !this.isFullscreen;
 
