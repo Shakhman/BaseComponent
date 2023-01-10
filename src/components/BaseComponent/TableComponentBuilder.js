@@ -4,6 +4,11 @@ import ComponentBuilder from './ComponentBuilder';
 import withFullscreen from './modules/hocs/withFullscreen';
 import TableComponentComposer from './TableComponentComposer';
 
+const tableVariants = {
+  'regular': 'RegularTable',
+  'multi-table': 'MultiTable',
+}
+
 export default class TableComponentBuilder extends ComponentBuilder {
   constructor() {
     super();
@@ -14,11 +19,11 @@ export default class TableComponentBuilder extends ComponentBuilder {
     this.contextHOCList = [];
   }
 
-  async withContext(view) {
-    const module = await import('./BaseTable.vue');
+  async withContext(variant = 'regular') {
+    const module = await import(`./${tableVariants[variant]}.vue`);
 
     this.view = {
-      view: view,
+      view: variant,
       component: module.default,
     };
 
