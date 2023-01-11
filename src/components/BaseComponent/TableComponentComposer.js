@@ -1,7 +1,7 @@
 import searchInitProps from './modules/initialProps/searchProps';
 import Vue from 'vue';
 
-const getMultiBindModuleSearch = () => Vue.observable({ on: {}, props: {}})
+const getMultiBindModuleSearch = () => ({ on: {}, props: {}})
 
 export default class TableComponentComposer {
   constructor(BaseComponent, ContextComponent) {
@@ -44,17 +44,31 @@ export default class TableComponentComposer {
           composedOptions: {},
         }
       },
+      computed: {
+        multiBindModuleSearch() {
+          return {
+            props: {
+              ...searchInitProps(),
+              ...this.moduleSearch.props,
+            },
+            on: {
+              ...this.moduleSearch.on,
+            }
+          }
+        }
+      },
       render(h) {
         const multiBindModuleSearch = getMultiBindModuleSearch();
 
         multiBindModuleSearch.on = this.moduleSearch.on,
         multiBindModuleSearch.props = { ...searchInitProps(), ...this.moduleSearch.props }
+        this.composedSearch = multiBindModuleSearch.props.value; 
 
         return h(BaseComponent, {
           props: {
             ...this.headerProps,
             ...this.$props,
-            moduleSearch: multiBindModuleSearch
+            moduleSearch: this.multiBindModuleSearch
           },
           on: {
             ...this.$listeners,
