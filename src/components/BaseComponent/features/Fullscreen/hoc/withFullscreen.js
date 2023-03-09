@@ -1,7 +1,7 @@
 import Fullscreen from '../Fullscreen.vue';
 import { VDialog } from 'vuetify/lib';
 
-export default function withFullscreen(WrappedComponent) {
+export function withFullscreen(WrappedComponent) {
   return {
     name: 'WithFullscreen',
     props: WrappedComponent.props,

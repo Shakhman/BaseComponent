@@ -1,4 +1,4 @@
-import searchInitProps from './modules/initialProps/searchProps';
+import { defaultProps } from './features/Search';
 import Vue from 'vue';
 
 const getMultiBindModuleSearch = () => ({ on: {}, props: {}})
@@ -48,7 +48,7 @@ export default class TableComponentComposer {
         multiBindModuleSearch() {
           return {
             props: {
-              ...searchInitProps(),
+              ...defaultProps(),
               ...this.moduleSearch.props,
             },
             on: {
@@ -61,7 +61,7 @@ export default class TableComponentComposer {
         const multiBindModuleSearch = getMultiBindModuleSearch();
 
         multiBindModuleSearch.on = this.moduleSearch.on,
-        multiBindModuleSearch.props = { ...searchInitProps(), ...this.moduleSearch.props }
+        multiBindModuleSearch.props = { ...defaultProps(), ...this.moduleSearch.props }
         this.composedSearch = multiBindModuleSearch.props.value; 
 
         return h(BaseComponent, {

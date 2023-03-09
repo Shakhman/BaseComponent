@@ -1,6 +1,6 @@
 import Search from '../Search.vue';
 
-export default function withSearch(WrappedComponent) {
+export function withSearch(WrappedComponent) {
   return {
     name: 'withSearch',
     props: {

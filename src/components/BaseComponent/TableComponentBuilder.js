@@ -1,7 +1,8 @@
 import ComponentWrapper from '../ComponentWrapper.vue';
-import withSearch from './modules/hocs/withSearch';
+import { withSearch } from './features/Search';
+import { withFullscreen } from './features/Fullscreen';
+
 import ComponentBuilder from './ComponentBuilder';
-import withFullscreen from './modules/hocs/withFullscreen';
 import TableComponentComposer from './TableComponentComposer';
 
 const tableVariants = {
